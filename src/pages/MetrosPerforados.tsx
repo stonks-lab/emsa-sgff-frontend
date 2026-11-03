@@ -5,7 +5,7 @@ import {
 } from 'recharts'
 import PageHeader from '../components/PageHeader'
 import KpiCard from '../components/KpiCard'
-import { getMetrosPai, getMetrosPaiVersiones, getMetrosAvance } from '../api/client'
+import { getMetrosPai, getMetrosAvance } from '../api/client'
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 const fmt = (n: number) =>
@@ -113,7 +113,22 @@ export default function MetrosPerforados() {
 
   // Load avance + versiones once
   useEffect(() => {
-    getMetrosPaiVersiones().then(setVersiones).catch(() => {})
+    fetch('/api/metros/pai/versiones', { headers: { Authorization: `Bearer ${localStorage.getItem('token') ?? ''}` } })
+      .then(r => {
+        console.log('[versiones] status:', r.status, r.ok)
+        return r.text()
+      })
+      .then(raw => {
+        console.log('[versiones] raw response:', raw.slice(0, 300))
+        try {
+          const d = JSON.parse(raw)
+          console.log('[versiones] parsed:', Array.isArray(d), d?.length, d?.[0])
+          if (Array.isArray(d) && d.length > 0) setVersiones(d)
+        } catch (e) {
+          console.error('[versiones] JSON parse error:', e)
+        }
+      })
+      .catch(e => console.error('[versiones] fetch error:', e))
     getMetrosAvance()
       .then(setRawAv)
       .catch(e => setError(String(e?.response?.data?.detail ?? e)))
@@ -298,7 +313,7 @@ export default function MetrosPerforados() {
 
       {/* Filtros */}
       <div className="mx-4 mb-3 bg-white rounded-xl shadow-sm p-3 flex flex-wrap gap-2 items-end">
-        {versiones.length > 0 && (
+        {Array.isArray(versiones) && versiones.length > 0 && (
           <div className="flex flex-col gap-1">
             <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Versión PAI</span>
             <select value={fVersion} onChange={e => setFVersion(e.target.value)} className={selCls}>

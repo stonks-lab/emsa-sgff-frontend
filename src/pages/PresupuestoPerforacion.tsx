@@ -201,10 +201,20 @@ export default function PresupuestoPerforacion() {
   useEffect(() => {
     getPresupuestoAnos()
       .then((r: { anos: number[] }) => {
+        console.log('[presupuesto-anos] response:', r)
         setAnos(r.anos)
-        if (r.anos.length > 0) setAno(r.anos[0])
+        if (r.anos.length > 0) {
+          setAno(r.anos[0])
+        } else {
+          setError('No se encontraron años de presupuesto en la base de datos.')
+          setLoading(false)
+        }
       })
-      .catch(() => {})
+      .catch(e => {
+        console.error('[presupuesto-anos] error:', e?.response?.data ?? e)
+        setError(String(e?.response?.data?.detail ?? 'Error al cargar años de presupuesto.'))
+        setLoading(false)
+      })
   }, [])
 
   useEffect(() => {
@@ -288,9 +298,9 @@ export default function PresupuestoPerforacion() {
 
   const hoyMesLabel = mesLabel(hoyMes)
 
+  if (error)   return <div className="p-6 text-red-500 text-sm">{error}</div>
   if (ano === undefined) return <div className="p-6 text-slate-400 text-sm">Cargando...</div>
   if (loading) return <div className="p-6 text-slate-400 text-sm">Cargando datos...</div>
-  if (error)   return <div className="p-6 text-red-500 text-sm">{error}</div>
   if (!data)   return null
 
   const { totales, proyectos } = data

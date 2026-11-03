@@ -1,7 +1,34 @@
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Component } from 'react'
+import { useAuth } from '../auth/AuthContext'
+import { canAccess, ROLE_LABELS } from '../auth/roles'
+import { api } from '../api/client'
 
-import type { ReactElement } from 'react'
+import type { ReactElement, ReactNode, ErrorInfo } from 'react'
+
+class RouteErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
+  state = { error: null }
+  static getDerivedStateFromError(error: Error) { return { error } }
+  componentDidCatch(error: Error, info: ErrorInfo) { console.error('[RouteErrorBoundary]', error, info) }
+  render() {
+    if (this.state.error) {
+      const err = this.state.error as Error
+      return (
+        <div style={{ padding: 24 }}>
+          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '16px 20px', color: '#b91c1c' }}>
+            <strong style={{ display: 'block', marginBottom: 6 }}>Error en esta página</strong>
+            <code style={{ fontSize: 12, whiteSpace: 'pre-wrap' }}>{err.message}</code>
+            <br />
+            <button onClick={() => this.setState({ error: null })} style={{ marginTop: 12, padding: '6px 14px', background: '#b91c1c', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 13 }}>
+              Reintentar
+            </button>
+          </div>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
 
 type Section = { section: string }
 type Item    = { to: string; label: string; icon: ReactElement }
@@ -68,6 +95,13 @@ const IconUpload = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
     <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+  </svg>
+)
+const IconUsers = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+    <circle cx="9" cy="7" r="4"/>
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
   </svg>
 )
 const IconMonday = () => (
@@ -155,6 +189,7 @@ const NAV: Entry[] = [
   { to: '/dashboard-dpo',  label: 'Dashboard DPO',   icon: <IconDashboard /> },
   { section: 'Administración' },
   { to: '/carga',          label: 'Carga de Datos',  icon: <IconUpload /> },
+  { to: '/usuarios',       label: 'Usuarios',        icon: <IconUsers /> },
 ]
 
 // Agrupa el NAV en secciones: [{ section, items }]
@@ -183,8 +218,92 @@ function activeSection(pathname: string): string {
   return ''
 }
 
+function ChangePasswordModal({ onClose }: { onClose: () => void }) {
+  const [current,  setCurrent]  = useState('')
+  const [next,     setNext]     = useState('')
+  const [confirm,  setConfirm]  = useState('')
+  const [error,    setError]    = useState('')
+  const [saving,   setSaving]   = useState(false)
+  const [success,  setSuccess]  = useState(false)
+
+  const INPUT = {
+    padding: '8px 12px', border: '1px solid var(--gray-200)', borderRadius: 7,
+    fontSize: 14, fontFamily: 'inherit', width: '100%', boxSizing: 'border-box' as const, outline: 'none',
+  }
+  const LABEL = {
+    fontSize: 11, fontWeight: 700 as const, color: 'var(--gray-600)',
+    textTransform: 'uppercase' as const, letterSpacing: '.5px', marginBottom: 5, display: 'block' as const,
+  }
+
+  const handleSave = async () => {
+    setError('')
+    if (!current || !next) { setError('Completa todos los campos'); return }
+    if (next.length < 6)   { setError('La contraseña debe tener al menos 6 caracteres'); return }
+    if (next !== confirm)  { setError('Las contraseñas no coinciden'); return }
+    setSaving(true)
+    try {
+      await api.put('/auth/password', { current_password: current, new_password: next })
+      setSuccess(true)
+      setTimeout(onClose, 1500)
+    } catch (e: any) {
+      setError(e.response?.data?.detail ?? 'Error al cambiar la contraseña')
+    } finally { setSaving(false) }
+  }
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, background: 'rgba(0,0,0,.45)', display: 'flex',
+      alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+    }} onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+      <div style={{ background: '#fff', borderRadius: 12, padding: '32px 36px', width: 380, boxShadow: '0 20px 60px rgba(0,0,0,.25)' }}>
+        <h3 style={{ margin: '0 0 24px', fontSize: 17, fontWeight: 700, color: 'var(--navy-800)' }}>
+          Cambiar contraseña
+        </h3>
+        {success ? (
+          <div style={{ textAlign: 'center', padding: '16px 0', color: 'var(--navy-700)', fontWeight: 600 }}>
+            ✓ Contraseña actualizada
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div>
+              <label style={LABEL}>Contraseña actual</label>
+              <input style={INPUT} type="password" value={current} onChange={e => setCurrent(e.target.value)} autoFocus />
+            </div>
+            <div>
+              <label style={LABEL}>Nueva contraseña</label>
+              <input style={INPUT} type="password" value={next} onChange={e => setNext(e.target.value)} />
+            </div>
+            <div>
+              <label style={LABEL}>Confirmar nueva contraseña</label>
+              <input style={INPUT} type="password" value={confirm} onChange={e => setConfirm(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handleSave() }} />
+            </div>
+            {error && (
+              <div style={{ background: 'var(--error-50, #fef2f2)', border: '1px solid var(--error-200, #fecaca)', borderRadius: 7, padding: '8px 12px', fontSize: 13, color: 'var(--error-700, #b91c1c)' }}>
+                {error}
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 4 }}>
+              <button onClick={onClose}
+                style={{ padding: '9px 18px', border: '1px solid var(--gray-200)', borderRadius: 7, background: '#fff', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>
+                Cancelar
+              </button>
+              <button onClick={handleSave} disabled={saving}
+                style={{ padding: '9px 18px', background: 'var(--navy-700)', color: '#fff', border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? .7 : 1, fontFamily: 'inherit' }}>
+                {saving ? 'Guardando…' : 'Cambiar'}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function Layout() {
+  const { user, logout } = useAuth()
   const location = useLocation()
+  const [showPwd, setShowPwd] = useState(false)
   const [open, setOpen] = useState<Record<string, boolean>>(() => {
     const active = activeSection(location.pathname)
     return Object.fromEntries(SECTIONS.map(s => [s.section, s.section === active]))
@@ -215,57 +334,85 @@ export default function Layout() {
           <span className="topbar-dot" />
           En línea
         </div>
+        {user && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginLeft: 8 }}>
+            <button
+              onClick={() => setShowPwd(true)}
+              title="Cambiar contraseña"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'right', lineHeight: 1.3, padding: '2px 4px' }}
+            >
+              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--navy-100, #dbeafe)' }}>{user.name}</div>
+              <div style={{ fontSize: 11, color: 'var(--navy-300, #93c5fd)' }}>{ROLE_LABELS[user.role] ?? user.role}</div>
+            </button>
+            <button
+              onClick={logout}
+              title="Cerrar sesión"
+              style={{
+                background: 'rgba(255,255,255,.1)', border: '1px solid rgba(255,255,255,.2)',
+                borderRadius: 6, padding: '5px 10px', cursor: 'pointer', color: '#fff',
+                fontSize: 12, fontFamily: 'inherit',
+              }}
+            >
+              Salir
+            </button>
+          </div>
+        )}
+        {showPwd && <ChangePasswordModal onClose={() => setShowPwd(false)} />}
       </header>
 
       {/* Body */}
       <div className="app-body">
         {/* Sidebar */}
         <nav className="sidebar">
-          {SECTIONS.map(({ section, items }) => (
-            <div key={section}>
-              {/* Sección colapsable */}
-              <button
-                onClick={() => toggle(section)}
-                style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  width: '100%', padding: '6px 12px', background: 'none', border: 'none',
-                  cursor: 'pointer', textAlign: 'left',
-                }}
-                className="sidebar-label"
-              >
-                <span>{section}</span>
-                <svg
-                  width="10" height="10" viewBox="0 0 10 10" fill="none"
-                  stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"
+          {SECTIONS.map(({ section, items }) => {
+            const visibleItems = items.filter(it => !user || canAccess(user.role, it.to))
+            if (!visibleItems.length) return null
+            return (
+              <div key={section}>
+                <button
+                  onClick={() => toggle(section)}
                   style={{
-                    transition: 'transform 0.2s',
-                    transform: open[section] ? 'rotate(180deg)' : 'rotate(0deg)',
-                    flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    width: '100%', padding: '6px 12px', background: 'none', border: 'none',
+                    cursor: 'pointer', textAlign: 'left',
                   }}
+                  className="sidebar-label"
                 >
-                  <polyline points="2 3 5 7 8 3" />
-                </svg>
-              </button>
+                  <span>{section}</span>
+                  <svg
+                    width="10" height="10" viewBox="0 0 10 10" fill="none"
+                    stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"
+                    style={{
+                      transition: 'transform 0.2s',
+                      transform: open[section] ? 'rotate(180deg)' : 'rotate(0deg)',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <polyline points="2 3 5 7 8 3" />
+                  </svg>
+                </button>
 
-              {/* Items */}
-              {open[section] && items.map(({ to, label, icon }) => (
-                <NavLink
-                  key={to}
-                  to={to}
-                  end={to === '/'}
-                  className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
-                >
-                  {icon}
-                  <span>{label}</span>
-                </NavLink>
-              ))}
-            </div>
-          ))}
+                {open[section] && visibleItems.map(({ to, label, icon }) => (
+                  <NavLink
+                    key={to}
+                    to={to}
+                    end={to === '/'}
+                    className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+                  >
+                    {icon}
+                    <span>{label}</span>
+                  </NavLink>
+                ))}
+              </div>
+            )
+          })}
         </nav>
 
         {/* Content */}
         <main className="main-content">
-          <Outlet />
+          <RouteErrorBoundary>
+            <Outlet />
+          </RouteErrorBoundary>
         </main>
       </div>
     </div>

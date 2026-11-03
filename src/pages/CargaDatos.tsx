@@ -1,6 +1,8 @@
 import { useCallback, useRef, useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import PageHeader from '../components/PageHeader'
+import { useAuth } from '../auth/AuthContext'
+import { allowedCargaTabs } from '../auth/roles'
 import {
   uploadProyeccionesPyC, uploadProyeccionesAdC, uploadDimensiones, uploadIncidencias, uploadCostoMetro, uploadProyectosInicio,
   getDpoConfig, saveDpoConfig, getDpoMesesCargados, deleteDpoCostoMetroMes,
@@ -480,7 +482,9 @@ function RegistroView() {
 
 // ── Page ───────────────────────────────────────────────────────────────────────
 export default function CargaDatos() {
+  const { user }      = useAuth()
   const location      = useLocation()
+  const allowedTabs   = allowedCargaTabs(user?.role ?? '')
   const [area, setArea] = useState<Area | null>(null)
   const [responsable, setResponsable] = useState(() => localStorage.getItem('carga_responsable') ?? '')
 
@@ -501,7 +505,7 @@ export default function CargaDatos() {
         {/* ── Menú ── */}
         {area === null && (
           <div style={{ display: 'flex', gap: 16, marginTop: 8 }}>
-            {(['dab', 'dpo', 'registro'] as Area[]).map(id => {
+            {(['dab', 'dpo', 'registro'] as Area[]).filter(id => allowedTabs.includes(id)).map(id => {
               const { label, icon, description } = AREAS[id]
               const isRegistro = id === 'registro'
               return (
