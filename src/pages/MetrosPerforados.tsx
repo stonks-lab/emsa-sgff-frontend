@@ -5,7 +5,7 @@ import {
 } from 'recharts'
 import PageHeader from '../components/PageHeader'
 import KpiCard from '../components/KpiCard'
-import { getMetrosPai, getMetrosAvance } from '../api/client'
+import { api, getMetrosPai, getMetrosAvance } from '../api/client'
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 const fmt = (n: number) =>
@@ -113,22 +113,11 @@ export default function MetrosPerforados() {
 
   // Load avance + versiones once
   useEffect(() => {
-    fetch('/api/metros/pai/versiones', { headers: { Authorization: `Bearer ${localStorage.getItem('token') ?? ''}` } })
+    api.get('/metros/pai/versiones')
       .then(r => {
-        console.log('[versiones] status:', r.status, r.ok)
-        return r.text()
+        if (Array.isArray(r.data) && r.data.length > 0) setVersiones(r.data)
       })
-      .then(raw => {
-        console.log('[versiones] raw response:', raw.slice(0, 300))
-        try {
-          const d = JSON.parse(raw)
-          console.log('[versiones] parsed:', Array.isArray(d), d?.length, d?.[0])
-          if (Array.isArray(d) && d.length > 0) setVersiones(d)
-        } catch (e) {
-          console.error('[versiones] JSON parse error:', e)
-        }
-      })
-      .catch(e => console.error('[versiones] fetch error:', e))
+      .catch(() => {})
     getMetrosAvance()
       .then(setRawAv)
       .catch(e => setError(String(e?.response?.data?.detail ?? e)))
