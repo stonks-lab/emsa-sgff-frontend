@@ -15,7 +15,7 @@ Cuando trabajes un ítem, abre un issue o PR y enlázalo aquí. Borra el ítem c
 ## P2
 
 ### 3. Token en `localStorage`
-El JWT se guarda en `localStorage` (`src/auth/AuthContext.tsx`, `src/api/client.ts`), así que queda expuesto ante cualquier XSS. Evaluar una cookie `HttpOnly` con el backend. Además, `MetrosPerforados.tsx` usa `fetch` con el token a mano en vez del cliente `axios` común.
+El JWT se guarda en `localStorage` (`src/auth/AuthContext.tsx`, `src/api/client.ts`), así que queda expuesto ante cualquier XSS. Evaluar una cookie `HttpOnly` con el backend.
 
 ### 3b. Llamadas a endpoints: estado con el backend del PR #4
 Contra el backend del [PR #4](https://github.com/stonks-lab/emsa-sgff-backend/pull/4), los 77 endpoints que llama el frontend responden 200 con datos de prueba. Hay que tener en cuenta:
@@ -33,6 +33,10 @@ El backend sirve el build desde `../frontend/dist`. Si este repo se clona con su
 
 ### 6. Bundle
 Vite avisa de chunks grandes y de un `import()` dinámico de `src/api/client.ts` que no surte efecto, porque el mismo módulo también se importa de forma estática. Evaluar dividir por ruta con `React.lazy`.
+
+### 6b. Usuarios muestra "0 usuarios" cuando falla la API
+`src/pages/Usuarios.tsx:47` carga la lista con `api.get('/auth/users').then(...)` y sin `.catch`. Si el backend responde con error (500, 403 o falla la red), la lista queda vacía y el contador dice "0 usuarios", como si no hubiera ninguno. Mostrar el error y distinguir "sin usuarios" de "no se pudo cargar".
+- El 4-nov le pasó a José después de actualizar su backend. Su Claude Code había informado que falta `users.json` en la raíz del backend (fuente: diagnóstico de José). **[inferido]** `/api/auth/users` respondía 500 → confirmar en F12 (José).
 
 ## P3
 
