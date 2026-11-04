@@ -66,6 +66,13 @@
   - con datos reales la tabla P&C vs AdC queda vacía porque el backend no carga AdC.
 - **Decisión:** crear el worklog y su dinámica en ambos repos. Este PR agrega `.worklog/`, `.claude/` (regla, comandos y hooks de sesión) y la sección de sesiones en `AGENTS.md`.
 
+### 14:38 — Reglas de flujo y de commits, y merge de los PR
+- **Decisión (usuario):** el repo usa siempre **GitHub Flow**. Pasará a **Gitflow** solo cuando lo decida Aldo. Los commits siguen siempre **Conventional Commits** y son **atómicos**. Quedó en `AGENTS.md` y `CLAUDE.md` (`16f703e`), y el hook y los comandos de sesión se alinearon en un commit aparte (`88b00d6`).
+- **Decisión (usuario):** revisar todos los PR y, si están en verde, mergear con merge commit o squash, a mi criterio. Luego sincronizar local con remoto. Este PR va con merge commit, para conservar sus commits separados.
+- **Hallazgo:** dos commits de este PR son anteriores a la regla y no la cumplen. No se reescriben porque ya están publicados:
+  - `955712f` mezcla worklog, backlog, `AGENTS.md` y `.gitignore`, así que no es atómico;
+  - la descripción de `46630b8` tiene 84 caracteres, más que el máximo de 72.
+
 ## Errores propios y cómo se corrigieron
 
 | Error | Cómo se detectó | Corrección |
