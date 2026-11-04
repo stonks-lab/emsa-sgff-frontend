@@ -17,6 +17,13 @@ Cuando trabajes un ítem, abre un issue o PR y enlázalo aquí. Borra el ítem c
 ### 3. Token en `localStorage`
 El JWT se guarda en `localStorage` (`src/auth/AuthContext.tsx`, `src/api/client.ts`), así que queda expuesto ante cualquier XSS. Evaluar una cookie `HttpOnly` con el backend. Además, `MetrosPerforados.tsx` usa `fetch` con el token a mano en vez del cliente `axios` común.
 
+### 3b. Llamadas a endpoints que no existen
+Contra el backend integrado (`feat/simulacion-improvements` + auth de `main`, ver ítem 1 del backlog del backend):
+- `getPycComparacion` (`/proyecciones/comparacion`), usado en `Proyecciones.tsx`: el endpoint no existe. El error se captura y la tabla de comparación queda siempre vacía.
+- `getEstadoProyectosTimeline` (`/estado-proyectos/saldo-timeline`): está definido en `client.ts`, pero ninguna pantalla lo usa. Se puede eliminar.
+- `/upload/proyecciones-adc` (carga AdC) no existe en ninguna rama del backend.
+- En consola aparece una advertencia de React por `key` duplicada en listas de `Simulacion.tsx`.
+
 ### 4. Advertencias de lint
 `oxlint` da 0 errores pero unas 98 advertencias. Las más relevantes: componentes creados durante el render (`react(static-components)`, en `SolpeTiempos.tsx`), `setState` dentro de efectos y llamadas impuras durante el render.
 
