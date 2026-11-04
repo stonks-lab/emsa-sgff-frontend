@@ -1,32 +1,82 @@
-# React + TypeScript + Vite
+# emsa-sgff-frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Interfaz web del **SGFF — Sistema de Gestión Físico-Financiera** de EMSA.
 
-Currently, two official plugins are available:
+El SGFF conecta la gestión **física** (la operación: proyectos, sondajes, metros perforados) con la gestión **financiera** (contratos, licitaciones, compras, presupuesto). Así se puede ver el impacto económico de cada decisión operativa. Reemplaza el trabajo que hoy se hace en planillas Excel y en Monday.com.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Backend asociado: [`emsa-sgff-backend`](https://github.com/stonks-lab/emsa-sgff-backend).
 
-## React Compiler
+## Módulos
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Módulo | Vistas |
+|---|---|
+| **Home** | Resumen ejecutivo |
+| **Estrategia** | Saldo de contratos, estados de pago, proyecciones, análisis por proyecto, sourcing plan, simulación |
+| **Operatividad** | Estado de proyectos, metros perforados, presupuesto de perforación |
+| **Modelos productivos** | Sondajes, campamento, movimiento de tierra |
+| **DAB** (Dirección de Abastecimiento) | Alertas, licitaciones, SOLPEs, dashboard DAB, KPI de contratos, modificaciones |
+| **DPO** (Dirección de Proyectos y Operaciones) | Dashboard DPO |
+| **Administración** | Carga de datos |
 
-## Expanding the Oxlint configuration
+## Stack
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+- [React 19](https://react.dev/) · TypeScript · [Vite](https://vite.dev/)
+- Tailwind CSS 4
+- React Router
+- Recharts (gráficos)
+- axios (cliente HTTP)
+- SheetJS `xlsx` (exportación e importación de planillas)
+- Oxlint (linter)
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+## Requisitos previos
+
+- Node.js 20 o superior y npm
+- El backend [`emsa-sgff-backend`](https://github.com/stonks-lab/emsa-sgff-backend) corriendo en `http://localhost:8000`
+
+## Instalación y ejecución local
+
+```bash
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+La app queda en `http://localhost:5173`. En desarrollo, Vite redirige las llamadas a `/api` hacia `http://localhost:8000` (ver `vite.config.ts`).
+
+## Scripts
+
+| Comando | Descripción |
+|---|---|
+| `npm run dev` | Servidor de desarrollo con HMR |
+| `npm run build` | Chequeo de tipos y build de producción en `dist/` |
+| `npm run preview` | Sirve el build localmente |
+| `npm run lint` | Ejecuta Oxlint |
+
+## Estructura del proyecto
+
+```
+src/
+├── api/client.ts     # Cliente axios y llamadas a la API (/api)
+├── components/       # Componentes reutilizables (Layout, KpiCard, PageHeader…)
+├── config/modules.ts # Definición de módulos y sus rutas
+├── pages/            # Una vista por pantalla
+├── App.tsx           # Rutas
+└── main.tsx          # Punto de entrada
+```
+
+## Despliegue
+
+`npm run build` genera `dist/`. En producción, el backend sirve ese build: espera encontrarlo en `frontend/dist`, en el mismo directorio padre que el backend.
+
+## Documentación
+
+La documentación técnica y funcional va en la carpeta [`docs/`](docs/) de este repositorio.
+
+## Contribuir
+
+1. Crea una rama desde `main` (`feat/…`, `fix/…`, `docs/…`).
+2. Haz commits con tu propia identidad de git/GitHub.
+3. Abre un Pull Request para revisión.
+
+---
+
+© EMSA. Uso interno.
