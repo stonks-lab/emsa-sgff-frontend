@@ -15,7 +15,7 @@ Cuando trabajes un ítem, abre un issue o PR y enlázalo aquí. Borra el ítem c
 ## P2
 
 ### 3. Token en `localStorage`
-El JWT se guarda en `localStorage` (`src/auth/AuthContext.tsx`, `src/api/client.ts`), así que queda expuesto ante cualquier XSS. Evaluar una cookie `HttpOnly` con el backend. Además, `MetrosPerforados.tsx` usa `fetch` con el token a mano en vez del cliente `axios` común.
+El JWT se guarda en `localStorage` (`src/auth/AuthContext.tsx`, `src/api/client.ts`), así que queda expuesto ante cualquier XSS. Evaluar una cookie `HttpOnly` con el backend.
 
 ### 3b. Llamadas a endpoints: estado con el backend del PR #4
 Contra el backend del [PR #4](https://github.com/stonks-lab/emsa-sgff-backend/pull/4), los 77 endpoints que llama el frontend responden 200 con datos de prueba. Hay que tener en cuenta:
