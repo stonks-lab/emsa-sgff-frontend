@@ -1,9 +1,26 @@
 import axios from 'axios'
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: '/api',
   paramsSerializer: { indexes: null },  // arrays como clave repetida: arr=a&arr=b (formato FastAPI)
 })
+
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('token')
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
+
+api.interceptors.response.use(
+  r => r,
+  err => {
+    if (err.response?.status === 401) {
+      localStorage.removeItem('token')
+      window.location.href = '/login'
+    }
+    return Promise.reject(err)
+  },
+)
 
 export const getHomeKpis    = (p?: object) => api.get('/home/kpis',        { params: p }).then(r => r.data)
 export const getHomeFiltros = ()           => api.get('/home/filtros').then(r => r.data)
@@ -66,7 +83,7 @@ export const getEstadoProyectosResumen    = (p?: object) => api.get('/estado-pro
 export const getEstadoProyectosTimeline   = (p?: object) => api.get('/estado-proyectos/saldo-timeline', { params: p }).then(r => r.data)
 
 export const getMetrosPai               = (ano?: number, version?: string) => api.get('/metros/pai', { params: { ano, version } }).then(r => r.data)
-export const getMetrosPaiVersiones      = () => api.get('/metros/pai/versiones').then(r => r.data)
+export const getMetrosPaiVersiones      = () => api.get('/metros/pai/versiones').then(r => Array.isArray(r.data) ? r.data : [])
 export const getMetrosAvance            = () => api.get('/metros/avance').then(r => r.data)
 export const getPresupuestoAnos         = () => api.get('/metros/presupuesto-anos').then(r => r.data)
 export const getPresupuestoPerforacion  = (ano?: number) => api.get('/metros/presupuesto-perforacion', { params: { ano } }).then(r => r.data)
