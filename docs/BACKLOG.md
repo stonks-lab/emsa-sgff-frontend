@@ -17,10 +17,11 @@ Cuando trabajes un ítem, abre un issue o PR y enlázalo aquí. Borra el ítem c
 ### 3. Token en `localStorage`
 El JWT se guarda en `localStorage` (`src/auth/AuthContext.tsx`, `src/api/client.ts`), así que queda expuesto ante cualquier XSS. Evaluar una cookie `HttpOnly` con el backend. Además, `MetrosPerforados.tsx` usa `fetch` con el token a mano en vez del cliente `axios` común.
 
-### 3b. Llamadas a endpoints que no existen
-Contra el backend integrado (`feat/simulacion-improvements` + auth de `main`, ver ítem 1 del backlog del backend):
-- `getPycComparacion` (`/proyecciones/comparacion`), usado en `Proyecciones.tsx`: el endpoint no existe. El error se captura y la tabla de comparación queda siempre vacía.
-- `getEstadoProyectosTimeline` (`/estado-proyectos/saldo-timeline`): está definido en `client.ts`, pero ninguna pantalla lo usa. Se puede eliminar.
+### 3b. Llamadas a endpoints: estado con el backend del PR #4
+Contra el backend del [PR #4](https://github.com/stonks-lab/emsa-sgff-backend/pull/4), los 77 endpoints que llama el frontend responden 200 con datos de prueba. Hay que tener en cuenta:
+- **Bloques vacíos sin error.** Las pantallas capturan los errores de la API (`.catch(() => setX(null))`) y muestran el bloque vacío, así que una pantalla rota puede no dar error en la consola. Para saber si un endpoint "no se usa", búscalo por la ruta **y** por el nombre de la función de `src/api/client.ts`.
+- `getEstadoProyectosTimeline` (`/estado-proyectos/saldo-timeline`): **no eliminar.** Lo usa `AnalisisProyecto.tsx` para la tabla "Proyección de Saldo mínimo por Proyecto". Se había perdido en la integración y se recuperó desde `main` del backend.
+- `getPycComparacion` (`/proyecciones/comparacion`) y los filtros `proyecto` y `periodo_hasta` de la tabla de `Proyecciones.tsx`: vuelven a funcionar con el PR #4. Pero **con datos reales la tabla P&C vs AdC queda vacía**: desde el 19-oct el backend no tiene ninguna carga AdC, y lo mismo pasa con el botón AdC del timeline. La columna "Tipo servicio" de esa tabla también sale vacía. Decisión de producto pendiente: volver a cargar AdC o sacar esas vistas (backlog del backend, ítem 1a).
 - `/upload/proyecciones-adc` (carga AdC) no existe en ninguna rama del backend.
 - En consola aparece una advertencia de React por `key` duplicada en listas de `Simulacion.tsx`.
 
