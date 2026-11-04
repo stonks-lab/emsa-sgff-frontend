@@ -4,5 +4,6 @@ Las instrucciones de este repo están en [AGENTS.md](AGENTS.md). Las más import
 
 - **La rama principal es `main`.** Ramas `feat/`, `fix/` o `docs/` desde `main`, y siempre PR hacia `main`.
 - Antes de abrir un PR, corre `npm run build` y `npm run lint`.
+- Abre la sesión con `/inicio-sesion` y ciérrala con `/cierre-sesion`; el registro va en `.worklog/`.
 
 @AGENTS.md

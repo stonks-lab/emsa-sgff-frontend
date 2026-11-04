@@ -31,5 +31,17 @@ Antes de abrir un PR, corre `npm run build` y `npm run lint`. No agregues errore
 - Las llamadas a la API van en `src/api/client.ts`, con base `/api`.
 - Los módulos y sus rutas se definen en `src/config/modules.ts`, y la navegación en `src/components/Layout.tsx`.
 - Hay una vista por pantalla en `src/pages/`.
-- La documentación va en la carpeta `docs/` de este repo. No hay un repo `-docs` aparte.
+- Las pantallas capturan los errores de la API y muestran el bloque vacío. Que no haya errores en la consola no significa que la pantalla funcione: revisa que los bloques tengan datos.
+- Antes de dar por "no usado" un endpoint o una función del cliente, búscala por la ruta **y** por el nombre de la función de `src/api/client.ts`.
+- La documentación va en la carpeta `docs/` de este repo y los pendientes técnicos en [`docs/BACKLOG.md`](docs/BACKLOG.md). No hay un repo `-docs` aparte.
 - No subas secretos ni archivos `.env`.
+
+## Sesiones y worklog
+
+El trabajo se registra en [`.worklog/`](.worklog/INDICE.md) con el protocolo de [`.claude/rules/sesiones.md`](.claude/rules/sesiones.md). Con Claude Code: `/inicio-sesion <objetivo>` al empezar y `/cierre-sesion` al terminar, en la misma rama.
+
+- **Una sesión = una rama = un archivo** `.worklog/sesiones/AAAA-MM-DD_tema.md`, con su fila en `.worklog/INDICE.md`.
+- Registra decisiones con hora, quién decidió y por qué. Anota también los hallazgos y los errores, incluidos los propios.
+- **Cada hecho lleva su fuente** (commit, PR, comando o prueba). Lo que no se pudo comprobar se marca **[inferido]**, con a quién preguntar. No se reconstruye el *por qué* de un cambio ajeno desde su diff.
+- Si la sesión también toca el backend, enlaza su archivo de sesión en `emsa-sgff-backend/.worklog/`.
+- Lo anterior al 4-nov de 2026 está reconstruido desde git en [`.worklog/HISTORIAL-RECONSTRUIDO.md`](.worklog/HISTORIAL-RECONSTRUIDO.md).
