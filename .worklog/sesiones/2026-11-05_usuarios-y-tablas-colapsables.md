@@ -21,6 +21,10 @@
 - **Hallazgo:** en Chrome contra el stack local, las tres tablas parten con `aria-expanded=false` y se abren al hacer clic (Proyecciones: 10 y 560 filas; Contratos por Proyecto: 18). Sin `users.json`, Usuarios y Login muestran "No existe users.json en la raíz del backend…" (fuente: capturas y `javascript_tool`).
 - **Hallazgo:** `tsc -b` sigue con 32 errores y `oxlint` con 98 advertencias y 0 errores, igual que `main`. `vite build` funciona (fuente: comparación de las dos ramas).
 
+### 12:00 — Publicación sin PR
+- **Decisión:** por Aldo, subir los commits directo a `main` como hotfix, sin PR. Excepción explícita a la regla de `AGENTS.md` ("todo cambio entra por PR") para que José reciba los arreglos de inmediato. Se publicó con fast-forward, que conserva los commits atómicos.
+- **Hallazgo:** el `users.json` que compartió José (1 usuario, `admin`) funciona con este backend: login 200, `/auth/users` 200 con 1 usuario y clave incorrecta 401 (fuente: `curl` contra el stack local, con su archivo puesto temporalmente).
+
 ## Resumen
 - **Logros:** Usuarios y Login muestran el error real de la API. Las tres tablas vuelven a ser colapsables.
 - **Bloqueos:** ninguno.
