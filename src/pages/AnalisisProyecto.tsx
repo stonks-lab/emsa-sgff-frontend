@@ -51,6 +51,8 @@ export default function AnalisisProyecto() {
   const [proyTimelineLoading, setProyTimelineLoading] = useState(true)
   const [proyProyecciones,    setProyProyecciones]    = useState<string[]>(['P&C'])
   const [expandedProys,       setExpandedProys]       = useState<Set<string>>(new Set())
+  // La tabla de contratos parte colapsada; se abre con clic en el título
+  const [abrirContratos,      setAbrirContratos]      = useState(false)
   const [contractData,        setContractData]        = useState<Record<string, any>>({})
   const [contractLoading,     setContractLoading]     = useState<Set<string>>(new Set())
   const [proySortCol,         setProySortCol]         = useState<string>('')
@@ -439,7 +441,12 @@ export default function AnalisisProyecto() {
       <div className="px-4 pb-6">
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-100">
-            <span className="text-sm font-semibold text-gray-700">Contratos por Proyecto</span>
+            <button type="button" onClick={() => setAbrirContratos(v => !v)} aria-expanded={abrirContratos}
+              className="flex items-center gap-1.5 text-sm font-semibold text-gray-700 hover:text-gray-900">
+              <span className="text-[9px] text-gray-400">{abrirContratos ? '▼' : '▶'}</span>
+              Contratos por Proyecto
+              <span className="text-xs font-normal text-gray-400">({tabla.length})</span>
+            </button>
             <select
               value={proyectoSel}
               onChange={e => setProyectoSel(e.target.value)}
@@ -452,6 +459,7 @@ export default function AnalisisProyecto() {
             </select>
           </div>
 
+          {abrirContratos && (
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead className="bg-slate-50 text-gray-500 uppercase text-[10px] tracking-wide">
@@ -502,6 +510,7 @@ export default function AnalisisProyecto() {
               <p className="text-xs text-gray-400 text-center py-6">Sin datos</p>
             )}
           </div>
+          )}
         </div>
       </div>
     </div>
