@@ -34,9 +34,6 @@ El backend sirve el build desde `../frontend/dist`. Si este repo se clona con su
 ### 6. Bundle
 Vite avisa de chunks grandes y de un `import()` dinámico de `src/api/client.ts` que no surte efecto, porque el mismo módulo también se importa de forma estática. Evaluar dividir por ruta con `React.lazy`.
 
-### 6b. Usuarios muestra "0 usuarios" cuando falla la API
-`src/pages/Usuarios.tsx:47` carga la lista con `api.get('/auth/users').then(...)` y sin `.catch`. Si el backend responde con error (500, 403 o falla la red), la lista queda vacía y el contador dice "0 usuarios", como si no hubiera ninguno. Mostrar el error y distinguir "sin usuarios" de "no se pudo cargar".
-- El 4-nov le pasó a José después de actualizar su backend. Su Claude Code había informado que falta `users.json` en la raíz del backend (fuente: diagnóstico de José). **[inferido]** `/api/auth/users` respondía 500 → confirmar en F12 (José).
 
 ## P3
 
