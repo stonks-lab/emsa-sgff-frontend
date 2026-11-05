@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import axios from 'axios'
 import { useAuth } from '../auth/AuthContext'
 
 export default function Login() {
@@ -14,8 +15,12 @@ export default function Login() {
     setLoading(true)
     try {
       await login(username, password)
-    } catch {
-      setError('Usuario o contraseña incorrectos')
+    } catch (err) {
+      const status = axios.isAxiosError(err) ? err.response?.status : undefined
+      const detail = axios.isAxiosError(err) ? err.response?.data?.detail : undefined
+      setError(status === 401
+        ? 'Usuario o contraseña incorrectos'
+        : detail ?? `No se pudo iniciar sesión${status ? ` (error ${status})` : ''}`)
     } finally {
       setLoading(false)
     }
