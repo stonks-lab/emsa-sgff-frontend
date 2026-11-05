@@ -10,6 +10,7 @@ Una fila por sesión; la agrega `/cierre-sesion`. El detalle está en `sesiones/
 |---|---|---|---|
 | [11-04](sesiones/2026-11-04_renombre-y-cierre-de-prs.md) | Renombre `dabdpo-frontend` → `emsa-sgff-frontend`, README, `AGENTS.md`/`CLAUDE.md` y backlog. Merge de Simulación y auth JWT a `main` (PR #2, con merge commit). Pantallas verificadas en Chrome contra el backend de `main` y el del PR #4 del backend. Creación del worklog | `README.md`, `AGENTS.md`, `docs/BACKLOG.md`, `.worklog/` | ✅ (depende del PR #4 del backend) |
 | [11-04](sesiones/2026-11-04_dogfooding-main-y-pr-6.md) | Dogfooding de `main` (22 pantallas, simulación, login por rol) con el backend de `main` antes de la migración de José. Prompt de migración para José y revisión de su PR #6 (`MetrosPerforados.tsx` con `api.get`, proxy de Vite), aprobado y mergeado por él. Seguimiento de las pantallas sin datos en su equipo: `dist` del 29-oct, backend con código anterior a la integración y `users.json` faltante ("0 usuarios", backlog 6b) | `.worklog/`, `docs/BACKLOG.md` | ✅ |
+| [11-05](sesiones/2026-11-05_usuarios-y-tablas-colapsables.md) | Usuarios y Login muestran el error real de la API. Tablas colapsables (cerradas al cargar) en Proyecciones y en Análisis por Proyecto | `src/pages/`, `docs/BACKLOG.md` | ✅ |
 
 ## Antes del worklog
 
