@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import axios from 'axios'
 import PageHeader from '../components/PageHeader'
 import { ROLE_LABELS } from '../auth/roles'
 import { api } from '../api/client'
@@ -35,6 +36,7 @@ const EMPTY_FORM = { username: '', name: '', role: 'dab', password: '', password
 export default function Usuarios() {
   const [users,   setUsers]   = useState<UserRow[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
   const [modal,   setModal]   = useState<'create' | 'edit' | 'pwd' | null>(null)
   const [editing, setEditing] = useState<UserRow | null>(null)
   const [form,    setForm]    = useState({ ...EMPTY_FORM })
@@ -44,7 +46,16 @@ export default function Usuarios() {
 
   const load = () => {
     setLoading(true)
-    api.get('/auth/users').then(r => setUsers(r.data)).finally(() => setLoading(false))
+    setLoadError('')
+    api.get('/auth/users')
+      .then(r => setUsers(r.data))
+      .catch(e => {
+        const detail = axios.isAxiosError(e) ? e.response?.data?.detail : undefined
+        const status = axios.isAxiosError(e) ? e.response?.status : undefined
+        setUsers([])
+        setLoadError(detail ?? `No se pudo cargar la lista de usuarios${status ? ` (error ${status})` : ''}`)
+      })
+      .finally(() => setLoading(false))
   }
 
   useEffect(() => { load() }, [])
@@ -126,7 +137,7 @@ export default function Usuarios() {
         <div className="panel" style={{ maxWidth: 860 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
             <div style={{ fontSize: 13, color: 'var(--gray-500)' }}>
-              {loading ? 'Cargando…' : `${users.length} usuario${users.length !== 1 ? 's' : ''}`}
+              {loading ? 'Cargando…' : loadError ? 'Sin datos' : `${users.length} usuario${users.length !== 1 ? 's' : ''}`}
             </div>
             <button
               onClick={openCreate}
@@ -139,6 +150,12 @@ export default function Usuarios() {
               <span style={{ fontSize: 16, lineHeight: 1 }}>+</span> Nuevo usuario
             </button>
           </div>
+
+          {loadError && (
+            <div role="alert" style={{ background: 'var(--error-50, #fef2f2)', border: '1px solid var(--error-200, #fecaca)', color: 'var(--error-700, #b91c1c)', borderRadius: 7, padding: '10px 14px', fontSize: 13, marginBottom: 16 }}>
+              {loadError}
+            </div>
+          )}
 
           {/* Tabla */}
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
