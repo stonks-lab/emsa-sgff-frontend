@@ -28,7 +28,13 @@
 ### 12:22 — Respaldo real de la base DAB
 - **Hallazgo:** con el respaldo real montado en el stack local, la tabla P&C vs AdC tiene 29 filas y el botón AdC del timeline tiene datos. Se corrigió la nota del backlog que decía lo contrario (`59274f6`). Detalle en la sesión hermana del backend.
 
+### 15:25–12:55 — Actualización del equipo de José
+- **Hallazgo:** José reconstruyó el frontend desde cero después de un `EPERM` de Windows con `npm ci` (Vite seguía corriendo y bloqueaba los módulos `.node`). `npx vite build` funcionó (fuente: Aldo). Detalle, estructura real de carpetas y regla de aprobación de PR en la sesión hermana del backend.
+- **Decisión:** por Aldo, todo PR lo aprueba otra persona del equipo, nunca quien lo abrió (`0a95687`).
+
 ## Resumen
-- **Logros:** Usuarios y Login muestran el error real de la API. Las tres tablas vuelven a ser colapsables.
+- **Logros:** Usuarios y Login muestran el error real de la API; las tablas de Proyecciones y Por Proyecto vuelven a ser colapsables; José tiene el build nuevo.
 - **Bloqueos:** ninguno.
-- **Para retomar:** José debe hacer pull y `npx vite build`. **[inferido]** preguntar a José si su versión local de las tablas colapsables tenía algo más, por ejemplo otras tablas.
+- **Para retomar:**
+  - Confirmar con José que las tablas colapsables calzan con su versión anterior y si `localhost:8000` sirve la interfaz (ítem 5).
+  - Backlog, ítem 1: los 32 errores de `tsc`.
