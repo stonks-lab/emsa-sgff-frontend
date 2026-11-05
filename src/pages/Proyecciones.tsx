@@ -107,6 +107,9 @@ export default function Proyecciones() {
   const [kpis,          setKpis]          = useState<any>(null)
   const [porMes,        setPorMes]        = useState<any[]>([])
   const [tabla,         setTabla]         = useState<any[]>([])
+  // Las tablas largas parten colapsadas; se abren con clic en el título
+  const [abrirCmp,      setAbrirCmp]      = useState(false)
+  const [abrirDetalle,  setAbrirDetalle]  = useState(false)
   const [timeline,      setTimeline]      = useState<any>(null)
   const [tlLoading,     setTlLoading]     = useState(true)
   const [filtroContrato,  setFiltroContrato]  = useState('')
@@ -512,12 +515,18 @@ export default function Proyecciones() {
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-gray-700">Comparación P&C vs AdC — contratos con proyección AdC</span>
+              <button type="button" onClick={() => setAbrirCmp(v => !v)} aria-expanded={abrirCmp}
+                className="flex items-center gap-1.5 text-sm font-semibold text-gray-700 hover:text-gray-900">
+                <span className="text-[9px] text-gray-400">{abrirCmp ? '▼' : '▶'}</span>
+                Comparación P&C vs AdC — contratos con proyección AdC
+                <span className="text-xs font-normal text-gray-400">({comparacion.length})</span>
+              </button>
               {(cmpContrato || cmpProyecto) && (
                 <button onClick={() => { setCmpContrato(''); setCmpProyecto('') }}
                   className="text-xs text-blue-500 hover:text-blue-700">Limpiar</button>
               )}
             </div>
+            {abrirCmp && (
             <div className="flex gap-2">
               <input type="text" placeholder="Contrato" value={cmpContrato}
                 onChange={e => setCmpContrato(e.target.value)}
@@ -525,8 +534,9 @@ export default function Proyecciones() {
               <input type="text" placeholder="Proyecto (ID_BLANCO)" value={cmpProyecto}
                 onChange={e => setCmpProyecto(e.target.value)}
                 className="text-xs border border-slate-200 rounded-lg px-2.5 py-1.5 bg-white text-gray-700 w-44" />
-            </div>
+            </div>)}
           </div>
+          {abrirCmp && (<>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead className="bg-slate-50 text-gray-500 uppercase text-[10px] tracking-wide">
@@ -582,6 +592,7 @@ export default function Proyecciones() {
               </div>
             )
           })()}
+          </>)}
         </div>
       </div>
 
@@ -590,7 +601,12 @@ export default function Proyecciones() {
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-gray-700">Detalle por contrato</span>
+              <button type="button" onClick={() => setAbrirDetalle(v => !v)} aria-expanded={abrirDetalle}
+                className="flex items-center gap-1.5 text-sm font-semibold text-gray-700 hover:text-gray-900">
+                <span className="text-[9px] text-gray-400">{abrirDetalle ? '▼' : '▶'}</span>
+                Detalle por contrato
+                <span className="text-xs font-normal text-gray-400">({tabla.length})</span>
+              </button>
               {(filtroContrato || filtroProyecto || filtroPeriodo || filtroPeriodoH || filtroTipo) && (
                 <button
                   onClick={() => { setFiltroContrato(''); setFiltroProyecto(''); setFiltroPeriodo(''); setFiltroPeriodoH(''); setFiltroTipo('') }}
@@ -600,6 +616,7 @@ export default function Proyecciones() {
                 </button>
               )}
             </div>
+            {abrirDetalle && (
             <div className="flex flex-wrap gap-2">
               <input
                 type="text" placeholder="Contrato" value={filtroContrato}
@@ -633,8 +650,9 @@ export default function Proyecciones() {
                 <option value="P&C">Solo P&C</option>
                 <option value="AdC">Solo AdC</option>
               </select>
-            </div>
+            </div>)}
           </div>
+          {abrirDetalle && (<>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead className="bg-slate-50 text-gray-500 uppercase text-[10px] tracking-wide">
@@ -695,6 +713,7 @@ export default function Proyecciones() {
               <p className="text-xs text-gray-400 text-center py-6">Sin datos para el filtro seleccionado</p>
             )}
           </div>
+          </>)}
         </div>
       </div>
     </div>
