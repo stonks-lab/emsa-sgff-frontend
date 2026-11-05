@@ -25,6 +25,9 @@
 - **Decisión:** por Aldo, subir los commits directo a `main` como hotfix, sin PR. Excepción explícita a la regla de `AGENTS.md` ("todo cambio entra por PR") para que José reciba los arreglos de inmediato. Se publicó con fast-forward, que conserva los commits atómicos.
 - **Hallazgo:** el `users.json` que compartió José (1 usuario, `admin`) funciona con este backend: login 200, `/auth/users` 200 con 1 usuario y clave incorrecta 401 (fuente: `curl` contra el stack local, con su archivo puesto temporalmente).
 
+### 12:22 — Respaldo real de la base DAB
+- **Hallazgo:** con el respaldo real montado en el stack local, la tabla P&C vs AdC tiene 29 filas y el botón AdC del timeline tiene datos. Se corrigió la nota del backlog que decía lo contrario (`59274f6`). Detalle en la sesión hermana del backend.
+
 ## Resumen
 - **Logros:** Usuarios y Login muestran el error real de la API. Las tres tablas vuelven a ser colapsables.
 - **Bloqueos:** ninguno.
