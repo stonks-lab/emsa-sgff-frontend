@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import axios from 'axios'
 import { useAuth } from '../auth/AuthContext'
+import { publicUrl } from '../config/base'
 
 export default function Login() {
   const { login }  = useAuth()
@@ -37,7 +38,7 @@ export default function Login() {
       }}>
         {/* Logo + título */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <img src="/logo-emsa-dark.svg" alt="EMSA" style={{ height: 36, marginBottom: 16 }}
+          <img src={publicUrl('logo-emsa-dark.svg')} alt="EMSA" style={{ height: 36, marginBottom: 16 }}
             onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
           <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--navy-900, #0f172a)' }}>
             Tablero DAB-DPO

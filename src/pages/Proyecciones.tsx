@@ -8,8 +8,9 @@ import * as XLSX from 'xlsx'
 import PageHeader from '../components/PageHeader'
 import KpiCard from '../components/KpiCard'
 import { uploadProyeccionesPyC, getPycTimeline, getPycComparacion } from '../api/client'
+import { API_BASE } from '../config/base'
 
-const api   = axios.create({ baseURL: '/api' })
+const api   = axios.create({ baseURL: API_BASE })
 const mmclp = (v: number) => `$${(v / 1e9).toFixed(2)} MM`
 const clp   = (v: number) =>
   new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(v)

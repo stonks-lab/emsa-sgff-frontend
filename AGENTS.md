@@ -40,7 +40,7 @@ Instrucciones para agentes de IA y personas que trabajan en este repositorio.
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173, redirige /api a http://localhost:8000
+npm run dev      # http://localhost:5173/sgff/, reenvía /sgff/api a http://localhost:8000/api
 npm run build    # tsc -b && vite build
 npm run lint     # oxlint
 ```
@@ -49,7 +49,8 @@ Antes de abrir un PR, corre `npm run build` y `npm run lint`. No agregues errore
 
 ## Convenciones
 
-- Las llamadas a la API van en `src/api/client.ts`, con base `/api`.
+- Las llamadas a la API van en `src/api/client.ts`, con base `API_BASE` (`/sgff/api`).
+- La app se publica bajo la sub-ruta `/sgff/`. Toda URL absoluta (API, imágenes de `public/`, redirecciones) sale de `src/config/base.ts`: no escribas rutas que empiecen con `/` a mano. Las rutas del router van sin prefijo.
 - Los módulos y sus rutas se definen en `src/config/modules.ts`, y la navegación en `src/components/Layout.tsx`.
 - Hay una vista por pantalla en `src/pages/`.
 - Las pantallas capturan los errores de la API y muestran el bloque vacío. Que no haya errores en la consola no significa que la pantalla funcione: revisa que los bloques tengan datos.
