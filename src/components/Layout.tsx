@@ -5,6 +5,7 @@ import { canAccess, ROLE_LABELS } from '../auth/roles'
 import { api } from '../api/client'
 
 import type { ReactElement, ReactNode, ErrorInfo } from 'react'
+import { publicUrl } from '../config/base'
 
 class RouteErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
   state = { error: null }
@@ -322,7 +323,7 @@ export default function Layout() {
     <div className="app">
       {/* Topbar */}
       <header className="topbar">
-        <img src="/logo-emsa-light.svg" className="topbar-logo" alt="EMSA" />
+        <img src={publicUrl('logo-emsa-light.svg')} className="topbar-logo" alt="EMSA" />
         <div className="topbar-divider" />
         <div>
           <div className="topbar-title">Tablero DAB-DPO</div>

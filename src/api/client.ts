@@ -1,7 +1,8 @@
 import axios from 'axios'
+import { API_BASE, BASE } from '../config/base'
 
 export const api = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE,
   paramsSerializer: { indexes: null },  // arrays como clave repetida: arr=a&arr=b (formato FastAPI)
 })
 
@@ -16,7 +17,7 @@ api.interceptors.response.use(
   err => {
     if (err.response?.status === 401) {
       localStorage.removeItem('token')
-      window.location.href = '/login'
+      window.location.href = `${BASE}login`
     }
     return Promise.reject(err)
   },

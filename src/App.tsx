@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { ROUTER_BASENAME } from './config/base'
 import { AuthProvider, useAuth } from './auth/AuthContext'
 import { canAccess, roleHome } from './auth/roles'
 import Layout from './components/Layout'
@@ -90,7 +91,7 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={ROUTER_BASENAME}>
       <AuthProvider>
         <AppRoutes />
       </AuthProvider>
