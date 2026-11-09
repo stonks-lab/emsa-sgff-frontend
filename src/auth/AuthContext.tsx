@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import axios from 'axios'
 import { API_BASE } from '../config/base'
+import { TOKEN_KEY } from '../api/client'
 
 export type User = { username: string; name: string; role: string }
 
@@ -17,22 +18,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem(TOKEN_KEY)
     if (!token) { setLoading(false); return }
     axios.get(`${API_BASE}/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => setUser(r.data))
-      .catch(() => localStorage.removeItem('token'))
+      .catch(() => localStorage.removeItem(TOKEN_KEY))
       .finally(() => setLoading(false))
   }, [])
 
   const login = async (username: string, password: string) => {
     const r = await axios.post(`${API_BASE}/auth/login`, { username, password })
-    localStorage.setItem('token', r.data.token)
+    localStorage.setItem(TOKEN_KEY, r.data.token)
     setUser(r.data.user)
   }
 
   const logout = () => {
-    localStorage.removeItem('token')
+    localStorage.removeItem(TOKEN_KEY)
     setUser(null)
   }
 

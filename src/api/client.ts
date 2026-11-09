@@ -1,13 +1,17 @@
 import axios from 'axios'
 import { API_BASE, BASE } from '../config/base'
 
+// Clave propia del SGFF: en el servidor, las apps comparten origen (http://servidor/<app>) y,
+// por lo tanto, el mismo localStorage. Una clave genérica como 'token' podría pisarse con otra app.
+export const TOKEN_KEY = 'sgff_token'
+
 export const api = axios.create({
   baseURL: API_BASE,
   paramsSerializer: { indexes: null },  // arrays como clave repetida: arr=a&arr=b (formato FastAPI)
 })
 
 api.interceptors.request.use(config => {
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem(TOKEN_KEY)
   if (token) config.headers.Authorization = `Bearer ${token}`
   return config
 })
@@ -16,7 +20,7 @@ api.interceptors.response.use(
   r => r,
   err => {
     if (err.response?.status === 401) {
-      localStorage.removeItem('token')
+      localStorage.removeItem(TOKEN_KEY)
       window.location.href = `${BASE}login`
     }
     return Promise.reject(err)
