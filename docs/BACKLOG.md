@@ -8,6 +8,7 @@ Cuando trabajes un ítem, abre un issue o PR y enlázalo aquí. Borra el ítem c
 
 ### 1. `npm run build` falla
 `tsc -b` da 32 errores de tipos (en `main` y en `feat/simulacion-improvements`), así que el build oficial no termina. Hoy solo funciona `vite build` directo. Los errores se concentran en `Modificaciones.tsx`, `SolpeTiempos.tsx`, `Home.tsx`, `Simulacion.tsx` y `PresupuestoPerforacion.tsx`: tipos de `Formatter` de Recharts, variables sin usar y propiedades que no existen en el tipo.
+El despliegue en el servidor no depende de esto: usa `npx vite build` (runbook del backend, Paso 7). El 9-nov se confirmó el mismo conteo en el servidor y en el Mac con `f1b1772`.
 
 ### 2. `xlsx` con vulnerabilidades conocidas
 `xlsx@^0.18.5`, la última versión de SheetJS publicada en npm, tiene vulnerabilidades conocidas: contaminación de prototipo (CVE-2023-30533) y ReDoS (CVE-2024-22363). SheetJS ya no publica en npm. Opciones: instalar la versión corregida desde el CDN de SheetJS o cambiar a otra librería (por ejemplo, `exceljs`).
@@ -15,7 +16,7 @@ Cuando trabajes un ítem, abre un issue o PR y enlázalo aquí. Borra el ítem c
 ## P2
 
 ### 3. Token en `localStorage`
-El JWT se guarda en `localStorage` (`src/auth/AuthContext.tsx`, `src/api/client.ts`), así que queda expuesto ante cualquier XSS. Evaluar una cookie `HttpOnly` con el backend.
+El JWT se guarda en `localStorage` (`src/auth/AuthContext.tsx`, `src/api/client.ts`), así que queda expuesto ante cualquier XSS. Evaluar una cookie `HttpOnly` con el backend. Desde la publicación bajo `/sgff/`, el SGFF comparte origen y `localStorage` con las otras apps del IIS. Por eso la clave pasó de `token` a `sgff_token`, pero un XSS en cualquier app de ese origen puede leerla. Es un motivo más para la cookie `HttpOnly` con `Path=/sgff`.
 
 ### 3b. Llamadas a endpoints: estado con el backend del PR #4
 Contra el backend del [PR #4](https://github.com/stonks-lab/emsa-sgff-backend/pull/4), los 77 endpoints que llama el frontend responden 200 con datos de prueba. Hay que tener en cuenta:
@@ -29,7 +30,10 @@ Contra el backend del [PR #4](https://github.com/stonks-lab/emsa-sgff-backend/pu
 `oxlint` da 0 errores pero unas 98 advertencias. Las más relevantes: componentes creados durante el render (`react(static-components)`, en `SolpeTiempos.tsx`), `setState` dentro de efectos y llamadas impuras durante el render.
 
 ### 5. Despliegue acoplado al nombre de carpeta
-El backend sirve el build desde `../frontend/dist`. Si este repo se clona con su nombre (`emsa-sgff-frontend`), el backend no lo encuentra. Coordinar con el ítem 6 del backlog del backend.
+El backend sirve el build desde `../frontend/dist`. Si este repo se clona con su nombre (`emsa-sgff-frontend`), el backend no lo encuentra. Coordinar con el ítem 6 del backlog del backend. En el servidor se resuelve con una *junction* `backend\frontend` → `..\frontend` (runbook del backend, Paso 7.2).
+
+### 5b. Falta `public/logo-emsa-dark.svg`
+`Login.tsx` lo usa, pero el archivo nunca existió en el repo. El backend responde con el `index.html` y el `onError` oculta la imagen, así que la pantalla de login sale sin logo. Agregar el SVG o usar `logo-emsa-light.svg`.
 
 ### 6. Bundle
 Vite avisa de chunks grandes y de un `import()` dinámico de `src/api/client.ts` que no surte efecto, porque el mismo módulo también se importa de forma estática. Evaluar dividir por ruta con `React.lazy`.
