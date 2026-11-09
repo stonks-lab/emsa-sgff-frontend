@@ -17,7 +17,10 @@
 - **Prueba:** build con `npx vite build`, servido por el backend real detrás de un proxy que imita la regla de IIS (quita `/sgff`, y todo lo demás da 404). Respondieron bien `/sgff`, `/sgff/`, los assets, `favicon.svg`, `logo-emsa-light.svg`, las rutas profundas (`/sgff/saldo`, `/sgff/login`), `/sgff/api/health` y el login. `/api/health` y `/` dan 404, como corresponde (fuente: `curl` contra el proxy). En `vite dev` también responden `/sgff/`, `/sgff/saldo` y `/sgff/api/health`.
 - **Prueba:** `tsc -b` sigue con los mismos 32 errores previos y `oxlint` con los mismos 98 avisos: ninguno nuevo (fuente: comparación antes y después).
 
+### 11:02 — Aprobación y merge
+- **Decisión:** Aldo Saavedra aprueba el PR y pide mergearlo. Es una **excepción** a la regla de `AGENTS.md` ("nunca de quien lo abrió"): el PR lo abrió su propia cuenta y GitHub no permite que el autor se apruebe a sí mismo. La aprobación queda en un comentario del PR. Decide Aldo, que es quien define estas reglas. Motivo: desbloquear el despliegue del servidor.
+
 ## Resumen
 - **Logros:** la app funciona bajo `/sgff/` en build y en desarrollo. Token con clave propia. README, AGENTS y backlog actualizados.
-- **Bloqueos:** el PR necesita la aprobación de otra persona del equipo antes del merge. El servidor lo necesita mergeado para el Paso 4 del runbook.
+- **Bloqueos:** ninguno. Lo aprobó Aldo (ver la excepción en el registro) y quedó mergeado.
 - **Para retomar:** en desarrollo, la app ahora queda en `http://localhost:5173/sgff/`. El stack local (`local/up.sh`, fuera del repo) imprime la URL sin `/sgff/`.
