@@ -85,11 +85,15 @@ export default function SourcingPlan() {
   const [tablaOpen,  setTablaOpen]  = useState(false)
 
   useEffect(() => {
-    getSourcingKpis().then(setKpis).catch(() => {})
     getSourcingTabla().then(setTabla).catch(() => setTabla([]))
-    getSourcingCoberturaMetros().then(setCobertura).catch(() => setCobertura([]))
     getLicitProcesos().then(setProcesos).catch(() => {})
+    getSourcingKpis().then(setKpis).catch(() => {})
   }, [])
+
+  useEffect(() => {
+    setCobertura([])
+    getSourcingCoberturaMetros(filtroProyecto || undefined).then(setCobertura).catch(() => setCobertura([]))
+  }, [filtroProyecto])
 
   const handleSegmentClick = useCallback((cubierto: boolean) => (data: any) => {
     // data.mes contiene YYYY-MM (el campo original preservado en chartData)
@@ -153,6 +157,10 @@ export default function SourcingPlan() {
     )
   }, [tabla, filtro, filtroProyecto, filtroEstado, filtroTipo, soloConFinEst, finEstMap])
 
+  // KPIs de conteo derivados de los datos filtrados
+  const kpiProyectos = useMemo(() => new Set(tablaFiltrada.map((r: any) => r.proyecto).filter(Boolean)).size, [tablaFiltrada])
+  const kpiContratos = useMemo(() => new Set(tablaFiltrada.map((r: any) => r.contrato).filter(Boolean)).size, [tablaFiltrada])
+
   if (!kpis) return <div className="p-6 text-gray-400 text-sm">Cargando...</div>
 
   return (
@@ -165,8 +173,8 @@ export default function SourcingPlan() {
 
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 px-4 pb-4">
-        <KpiCard label="Proyectos en Plan"    value={kpis.total_proyectos}     color="blue"   icon="📌" />
-        <KpiCard label="Contratos únicos"     value={kpis.total_contratos}     color="blue"   icon="📄" />
+        <KpiCard label="Proyectos en Plan"    value={kpiProyectos}  color="blue"   icon="📌" />
+        <KpiCard label="Contratos únicos"     value={kpiContratos}  color="blue"   icon="📄" />
         <KpiCard label="Metros cubiertos"     value={`${fmtN(cobKpis.totCub)} m`}    color="green"  icon="✅" />
         <KpiCard label="Metros no cubiertos"  value={`${fmtN(cobKpis.totNoCub)} m`}  color="orange" icon="⚠️"
           sub={cobKpis.pct > 0 ? `${cobKpis.pct}% cubierto` : undefined} />
@@ -387,7 +395,7 @@ export default function SourcingPlan() {
               {tablaOpen ? '▾' : '▸'}
             </span>
             <span className="text-sm font-semibold text-gray-700">Contratos del Plan</span>
-            <span className="text-xs text-gray-400">{tabla.length} contratos</span>
+            <span className="text-xs text-gray-400">{tablaFiltrada.length} contratos</span>
             {tablaOpen && (
               <input
                 type="text"

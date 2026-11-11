@@ -61,7 +61,8 @@ export const getPycComparacion         = (p?: object) => api.get('/proyecciones/
 
 export const getSourcingKpis             = ()  => api.get('/sourcing/kpis').then(r => r.data)
 export const getSourcingTabla            = ()  => api.get('/sourcing/tabla').then(r => r.data)
-export const getSourcingCoberturaMetros  = ()  => api.get('/sourcing/cobertura-metros').then(r => r.data)
+export const getSourcingCoberturaMetros  = (proyecto?: string) =>
+  api.get('/sourcing/cobertura-metros', { params: proyecto ? { proyecto } : {} }).then(r => r.data)
 export const getSourcingCoberturaDetalle = (mes: string, cubierto: boolean) =>
   api.get('/sourcing/cobertura-detalle', { params: { mes, cubierto: cubierto ? 1 : 0 } }).then(r => r.data)
 
